@@ -27,13 +27,6 @@ DEEPSEEK_API_KEY=your-deepseek-api-key
 
 Get a key at [platform.deepseek.com](https://platform.deepseek.com). Summarizing and chat won't work without it, but search still does.
 
-## Run
-
-```bash
-streamlit run "AI-paper Tracker.py"
-```
-
-Then open the URL Streamlit prints (defaults to `http://localhost:8501`).
 
 ## How it works
 
