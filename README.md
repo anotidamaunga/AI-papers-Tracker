@@ -35,7 +35,3 @@ Get a key at [platform.deepseek.com](https://platform.deepseek.com). Summarizing
 - **PDF extraction** uses [`pymupdf4llm`](https://pypi.org/project/pymupdf4llm/) to convert the paper's PDF into markdown text fed to the LLM.
 - **Summaries and chat** use DeepSeek's OpenAI-compatible API (`deepseek-chat`).
 
-## Notes
-
-- arXiv's public API sets no request timeout on its own, and can occasionally be slow or unresponsive; this app wraps it with a 15-second timeout so a stalled request fails with a clear error instead of hanging.
-- AI-lab search is best-effort: arXiv doesn't track author affiliation, so it only matches papers that mention the lab by name in the abstract or comments.
