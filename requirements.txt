@@ -3,3 +3,4 @@ arxiv
 openai
 pymupdf4llm
 python-dotenv
+requests
