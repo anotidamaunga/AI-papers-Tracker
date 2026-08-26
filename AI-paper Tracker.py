@@ -1,3 +1,4 @@
+import datetime
 import os
 import re
 import tempfile
@@ -108,14 +109,19 @@ def _strip_arxiv_version(short_id):
 def search_huggingface(topic_query, max_results, categories):
     """Pulls from huggingface.co/papers (community-curated, upvoted) rather than
     arXiv's own index, then fetches the matching papers' full metadata from arXiv
-    so they go through the same render/summarize pipeline. Topic blank = today's
-    trending papers; otherwise searches HF's full papers index by keyword."""
+    so they go through the same render/summarize pipeline. Topic blank = this
+    week's trending papers; otherwise searches HF's full papers index by keyword."""
     if topic_query:
         resp = requests.get(
             HF_PAPERS_SEARCH_URL, params={"q": topic_query}, timeout=ARXIV_REQUEST_TIMEOUT_SECONDS
         )
     else:
-        resp = requests.get(HF_DAILY_PAPERS_URL, timeout=ARXIV_REQUEST_TIMEOUT_SECONDS)
+        # A single day's cohort is often too thin early in the day/week for a
+        # meaningful "trending" ranking. The endpoint accepts an ISO week
+        # (YYYY-Www) to scope to the current week instead.
+        iso_year, iso_week, _ = datetime.datetime.now(datetime.timezone.utc).date().isocalendar()
+        week = f"{iso_year}-W{iso_week:02d}"
+        resp = requests.get(HF_DAILY_PAPERS_URL, params={"week": week}, timeout=ARXIV_REQUEST_TIMEOUT_SECONDS)
     resp.raise_for_status()
     entries = resp.json()
     entries.sort(key=lambda e: e.get("paper", {}).get("upvotes", 0), reverse=True)

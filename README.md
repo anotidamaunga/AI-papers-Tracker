@@ -20,7 +20,7 @@ Create a `.env` file in the project root with a [DeepSeek](https://platform.deep
 DEEPSEEK_API_KEY=your-deepseek-api-key
 ```
 
-Run it — note the filename has a space, so quote it:
+
 
 ```bash
 streamlit run "AI-paper Tracker.py"
