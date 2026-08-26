@@ -1,37 +1,33 @@
 # AI Paper Tracker
 
-A Streamlit app for discovering AI research papers, getting an LLM-generated summary, and chatting with the paper's content.
+A Streamlit app for keeping up with AI research without doom-scrolling arXiv. It opens straight into today's trending papers, lets you search a topic, and once you open a paper it downloads the PDF, summarizes it, and lets you ask it questions directly.
 
-Opens straight into today's trending papers from [Hugging Face Papers](https://huggingface.co/papers), or search by topic keywords, by AI lab, or Hugging Face's own upvote-ranked index.
+## How search works
 
-## Features
+arXiv is good at keyword matching but has no notion of what's actually worth reading. [Hugging Face Papers](https://huggingface.co/papers) has the opposite problem: it's a community-curated, upvoted feed, but it's not a general search index. So a topic search runs against both and merges them — anything upvoted on Hugging Face surfaces first, with the rest of the arXiv relevance ranking filling in behind it. That's also what's showing when the app first opens: today's top Hugging Face papers, no search needed.
 
-- **Trending on open** — the app auto-loads today's top Hugging Face Papers (ranked by upvotes) as soon as it starts, no search needed.
-- **Search by topic** — free-text keyword search across arXiv's title/abstract/comments.
-- **Search by AI lab** — matches a lab name (OpenAI, Google DeepMind, Anthropic, Meta AI, etc., or a custom name) against arXiv metadata; pair it with a topic keyword for much better precision, since arXiv has no institution field.
-- **Search Hugging Face Papers** — searches HF's community-curated papers index by topic, ranked by upvotes, then fetched from arXiv for the full text.
-- **Summarize** — downloads the paper's PDF, extracts it to markdown, and asks an LLM (DeepSeek) for a structured summary covering the core innovation, results, and limitations.
-- **Chat** — ask follow-up questions about a specific paper; answers are grounded only in that paper's extracted text.
+There's no dedicated "search by lab" mode. Doing that properly would mean scraping each lab's own publications page — arXiv doesn't carry author affiliation as searchable metadata, so a lab name is only findable when a paper happens to mention it in its abstract or comments, which misses most papers. Not worth pretending that's a real filter.
 
-## Setup
+## Quick start
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Create a `.env` file in the project root:
+Create a `.env` file in the project root with a [DeepSeek](https://platform.deepseek.com) key (summarizing and chat need it; search works without one):
 
 ```
 DEEPSEEK_API_KEY=your-deepseek-api-key
 ```
 
-Get a key at [platform.deepseek.com](https://platform.deepseek.com). Summarizing and chat won't work without it, but search still does.
+Run it — note the filename has a space, so quote it:
 
+```bash
+streamlit run "AI-paper Tracker.py"
+```
 
-## How it works
+## Under the hood
 
-- **arXiv search** uses the [`arxiv`](https://pypi.org/project/arxiv/) Python package against arXiv's public API.
-- **Hugging Face search** hits HF's `daily_papers` and `papers/search` endpoints directly, then cross-references the returned arXiv IDs to fetch full paper metadata — so all three search modes render through the same pipeline.
-- **PDF extraction** uses [`pymupdf4llm`](https://pypi.org/project/pymupdf4llm/) to convert the paper's PDF into markdown text fed to the LLM.
-- **Summaries and chat** use DeepSeek's OpenAI-compatible API (`deepseek-chat`).
-
+- Opening a paper downloads its arXiv PDF and runs it through [`pymupdf4llm`](https://pypi.org/project/pymupdf4llm/) to get clean markdown for the LLM.
+- Summaries and chat both go through DeepSeek's OpenAI-compatible API (`deepseek-chat`); chat is answered strictly from the extracted paper text, not general knowledge.
+- The `arxiv` package sets no HTTP timeout on its own requests, and arXiv's API is occasionally slow enough that this matters in practice — the app wraps every arXiv request with an explicit 15s timeout so a stalled request fails fast instead of hanging the UI.
