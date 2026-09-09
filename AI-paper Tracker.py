@@ -334,7 +334,7 @@ def search_page():
                 options=list(CATEGORIES.keys()),
                 format_func=lambda c: f"{c} — {CATEGORIES[c]}",
             )
-            max_results = st.slider("Max results", min_value=5, max_value=50, value=10)
+            max_results = st.slider("Max results", min_value=5, max_value=50, value=20)
 
     if search_clicked:
         st.session_state.auto_loaded = True
@@ -353,7 +353,7 @@ def search_page():
                     st.warning("No papers found — try different keywords.")
     elif not st.session_state.auto_loaded:
         st.session_state.auto_loaded = True
-        with st.spinner("Loading today's trending papers from Hugging Face..."):
+        with st.spinner("Loading this week's trending papers from Hugging Face..."):
             try:
                 results, hf_meta = search_huggingface("", 10, [])
                 st.session_state.results = results
@@ -367,7 +367,7 @@ def search_page():
         return
 
     st.subheader(
-        "Trending today" if st.session_state.results_are_trending else f"{len(st.session_state.results)} papers found"
+        "Trending this week" if st.session_state.results_are_trending else f"{len(st.session_state.results)} papers found"
     )
     ranked_by_upvotes = bool(st.session_state.hf_meta)
     for i, result in enumerate(st.session_state.results, start=1):
