@@ -355,7 +355,7 @@ def search_page():
         st.session_state.auto_loaded = True
         with st.spinner("Loading this week's trending papers from Hugging Face..."):
             try:
-                results, hf_meta = search_huggingface("", 10, [])
+                results, hf_meta = search_huggingface("", 20, [])
                 st.session_state.results = results
                 st.session_state.hf_meta = hf_meta
                 st.session_state.results_are_trending = True
