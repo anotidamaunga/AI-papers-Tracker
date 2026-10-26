@@ -4,3 +4,4 @@ openai
 pymupdf4llm
 python-dotenv
 requests
+pymupdf
